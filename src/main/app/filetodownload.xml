@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:https="http://www.mulesoft.org/schema/mule/https"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
+    <!--  <http:request-config name="HTTP_Request_Configuration" protocol="HTTPS" host="webdav.atypon.com" port="443" doc:name="HTTP Request Configuration">
+        <http:basic-authentication username="crc" password="tarantallegra"/>
+        <tls:context>
+            <tls:trust-store path="D:\DownloadedFiles\TF.keystore" password="gundala" type="jks"/>
+        </tls:context>
+    </http:request-config> -->
+    <http:request-config name="HTTP_Request_Configuration" protocol="HTTPS" host="webdav.atypon.com" port="443" responseTimeout="180000" doc:name="HTTP Request Configuration">
+        <http:basic-authentication username="crc" password="tarantallegra"/>
+        <tls:context>
+            <tls:trust-store path="D:\DownloadedFiles\TF.keystore" password="gundala" type="jks"/>
+        </tls:context>
+        <http:proxy host="172.22.218.218 " port="8085"/>
+    </http:request-config>
+    <flow name="loggertestFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/loggertest/*" doc:name="HTTP"/>
+        <logger message="Trying HTTPS" level="INFO" doc:name="Logger"/>
+        <component class="filetodownload.files" doc:name="Java"/>
+        <logger level="INFO" doc:name="Logger" message="#[message]"/>
+        <file:outbound-endpoint path="D:\NewFile1" responseTimeout="10000" doc:name="File"/>
+    </flow>
+</mule>
